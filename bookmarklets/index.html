@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Useful Bookmarklets</title>
+<style>
+body {
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  margin-top: 20px;
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
+h1 {
+  font-size: 20pt;
+  border-bottom: 1px solid silver;
+}
+
+h2 {
+  font-size: 12pt;
+  margin-top: 0px;
+  margin-bottom: 5px;
+  font-weight: bold;
+} 
+
+a {
+  color: black;
+  text-decoration: none;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  padding: 5px;
+  display: block;
+}
+
+a:hover {
+  background-color: #EEEEEE;
+}
+
+div {
+  margin-left: 10px;
+}
+
+</style>
+</head>
+
+<body>
+<h1>Useful Bookmarklets</h1>
+
+<a href="javascript: { let found=false; for (e of document.getElementsByTagName('a')) { if (e.href.startsWith('magnet:')) { navigator.clipboard.writeText(e.href); found = true; break; }} window.alert(found ? 'Magnet link copied to clipboard.':'No magnet links found on this page.'); }">
+<h2>magnets?</h2>
+<div>Searches the current webpage for <code>magnet:</code> links and copies the first one found to the clipboard. Displays an alert indicating whether any links were found or not.</div>
+</a>
+
+<a href="">
+<h2>title</h2>
+<div>description</div>
+</div>
+</a>
+
+</body>
+
+</html>
