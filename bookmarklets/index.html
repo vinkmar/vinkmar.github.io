@@ -45,10 +45,17 @@ div {
 <body>
 <h1>Useful Bookmarklets</h1>
 
-<a href="javascript: { let found=false; for (e of document.getElementsByTagName('a')) { if (e.href.startsWith('magnet:')) { navigator.clipboard.writeText(e.href); found = true; break; }} window.alert(found ? 'Magnet link copied to clipboard.':'No magnet links found on this page.'); }">
+<a href="javascript:{let found=false; for(e of document.getElementsByTagName('a')){if(e.href.startsWith('magnet:')){navigator.clipboard.writeText(e.href);found=true;break;}}window.alert(found?'Magnet link copied to clipboard.':'No magnet links found on this page.');}">
 <h2>magnets?</h2>
 <div>Searches the current webpage for <code>magnet:</code> links and copies the first one found to the clipboard. Displays an alert indicating whether any links were found or not.</div>
 </a>
+
+<a href="javascript:{let a=document.getElementsByName('ASIN')[0].value; a.length==10&&window.open('https://ca.camelcamelcamel.com/product/'+a+'#price-history');}">
+<h2>aph</h2>
+<div>Loads the Camelcamelcamel price history for the item you're currently viewing on Amazon.</div>
+</div>
+</a>
+
 
 <!--
 <a href="">
