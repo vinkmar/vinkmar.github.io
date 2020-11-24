@@ -248,7 +248,7 @@ bool isPhoneStatusHeadset() {
 					</section>
 
 					<section>
-						<pre style="font-size: 0.4em"><code data-trim data-noescape>
+						<pre style="font-size: 0.4em; max-height: none !important;"><code data-trim data-noescape style="max-height: none !important;">
 void pressPhoneHeadsetKey() {
 
   if (!Client.connect(PHONE_HOST, 80)) {
@@ -269,7 +269,7 @@ void pressPhoneHeadsetKey() {
 					</section>
 
 					<section>
-						<pre style="font-size: 0.4em"><code data-trim data-noescape>
+						<pre style="font-size: 0.4em; max-height: none !important;"><code data-trim data-noescape style="max-height: none !important;">
 void setup() {
   pinMode(AUX_SIGNAL, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(AUX_SIGNAL), auxSignalIsr, CHANGE);
