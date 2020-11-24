@@ -1,0 +1,476 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>More Than You Ever Wanted To Know About Wireless Headsets (@vinkmar)</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/black.css" id="theme">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+
+		<style>
+			body { background-color: black !important; }
+			h3 { color: blueviolet !important; }
+			.section-title { color: blueviolet; font-size: 0.6em; text-transform: uppercase; text-align: left; }
+			.slide-title { font-size: 1.3em; text-transform: uppercase; text-align: left; }
+			.slide-subtitle { }
+			.sub-slide-bulleted { padding: 20px; text-align: left; }
+			.sub-slide-centered { padding: 20px; text-align: center; }
+			ul { line-height: 2em; }
+		</style>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+
+				<section>
+					<div style="display: flex; flex-flow: row nowrap; justify-content: center; align-items: center">
+						<div style="flex-basis: 60%; text-align: left">
+							<h3><span style="color: gray">More Than You<br />
+								<span style="color: white;">Ever</span> Wanted<br />
+								To Know About<br /></span>
+							  <span style="color: blueviolet">Wireless Headsets</span></h3>
+							<small>&nbsp;<br />@vinkmar<br /><span style="color: gray">November 2020</span></small>
+						</div>
+						<div style="flex-basis: 40%">
+							<img src="lewis-caroll-rabbit.png" />
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h3>Caveats</h3>
+					<div>
+						<div class="fragment fade-in-then-semi-out" style="line-height: 1em">&quot;more than you ever wanted to know&quot;<br />!=<br />everything<br />&nbsp;</div>
+						<div class="fragment fade-in-then-semi-out">many details omitted<br />&nbsp;</div>
+						<div class="fragment fade-in-then-semi-out">this project is a series of rabbit holes</div>
+					</div>
+				</section>
+
+				<section>
+					<h3>Wired Headset Basics</h3>
+					<section>
+						&nbsp;<br />
+						<img src="jabra-headset-connection.png" />
+					</section>
+				</section>
+
+				<section>
+					<h3>Wireless Headset Basics</h3>
+					<section>
+						&nbsp;<br />
+						<img src="jabra-headset-wireless-connection.png" />
+					</section>
+					<section>
+						But what about when you're not at your desk to answer the phone?
+					</section>
+					<section>
+						&nbsp;<br />
+						<img src="jabra-handset-lifter.png" style="padding: 0; margin: 0;"/>
+						<div style="font-size: 0.5em">handset lifter</div>
+					</section>
+					<section>
+						&nbsp;<br />
+						<img src="jabra-ehs-cables.png" style="padding: 0; margin: 0;"/>
+						<div style="font-size: 0.5em">electronic hookswitch adapter</div>
+					</section>
+				</section>
+
+				<section>
+					<h3>Motivation</h3>
+					<section>
+						<img src="headset.jpg" style="height: 400px;"/>
+						<div>Back at the start of the pandemic,<br />I spent too much money on one of these...</div>
+					</section>
+					<section>
+						<div>And it worked great</div>
+						<div class="fragment fade-in">except for a few shortcomings...<br />&nbsp;</div>
+						<div class="fragment fade-in">there's no EHS adapter for a Cisco SPA504G<br />&nbsp;</div>
+						<div class="fragment fade-in">a handset lifter doesn't work with the phone's dedicated headset port and mode</div>
+					</section>
+					<section>
+						<div>So I thought</div>
+						<div class="fragment fade-in">
+							<img src="scream-headset.jpg" style="height: 400px;" />
+							<div>why not build my own EHS adapter?</div>
+						</div>
+					</section>
+				</section>
+
+				<section>
+					<h3>Requirements &amp; Constraints</h3>
+					<ul>
+						<li class="fragment fade-in-then-semi-out">remotely answer/end deskphone calls</li>
+						<li class="fragment fade-in-then-semi-out">leverage phone's headset port and mode</li>
+						<li class="fragment fade-in-then-semi-out">no external power supply</li>
+						<li class="fragment fade-in-then-semi-out">don't really care about ring notifications</li>
+						<li class="fragment fade-in-then-semi-out">don't want to destroy a Cisco SPA504G</li>
+						<li class="fragment fade-in-then-semi-out">definitely don't want to destroy a Jabra Engage 75</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>Interfacing with a Cisco SPA504G</h3>
+
+					<section>
+						How can we put the phone into headset mode?
+					</section>
+
+					<section>
+						&nbsp;<br />
+						<img src="cisco-phone-front.jpg" style="height: 600px" />
+					</section>
+
+					<section>
+						<img src="cisco-phone-ipphoneexecute-doc.png" />
+					</section>
+
+					<section>
+						<img src="cisco-phone-uri-doc.png" />
+						<div style="font-size: 0.5em" class="fragment fade-in">thankfully, the documentation lies...</div>
+					</section>
+
+					<section>
+						<img src="cisco-phone-sample-post.png" />
+					</section>
+
+					<section>
+						How can we figure out if the phone<br />is in headset mode?
+					</section>
+
+					<section>
+						&nbsp;<br />
+						<img src="cisco-phone-html-interface.png" style="height: 600px" />
+					</section>
+
+					<section>
+						&nbsp;<br />
+						<img src="cisco-phone-endless-xml-config.png" />
+						<div style="font-size: 0.5em">
+							<code>GET /admin/spacfg.xml</code><br />
+							(undocumented, of course)
+						</div>
+					</section>
+
+					<section>
+						<img src="cisco-phone-screendump.png" style="border: 5px solid gray;" />
+						<div style="font-size: 0.5em">
+							<code>GET /admin/screendump.bmp</code><br />
+							(also undocumented)
+						</div>
+					</section>
+
+				</section>
+
+				<section>
+
+					<h3>Interfacing with a Jabra Engage 75</h3>
+
+					<section>
+						The headset's base has a<br />proprietary RJ45 AUX port
+					</section>
+
+					<section>
+						&nbsp;<br />
+						<img src="jabra-link-22.png" />
+					</section>
+
+					<section>
+						&nbsp;<br />
+						<img src="dhsg-page-1.png" />
+					</section>
+
+					<section>
+						<img src="dhsg-page-2.png" />
+					</section>
+
+					<section>
+						<img src="pulseview.png" />
+					</section>
+
+					<section>
+						<img src="jabra-direct-ehs-type.png" />
+					</section>
+
+					<section>
+						&nbsp;<br />
+						<img src="random-jabra-re.png" />
+						<div style="font-size: 0.5em">
+							https://electronic-products-design.com
+						</div>
+					</section>
+
+				</section>
+
+				<section>
+
+					<h3>Putting It All Together</h3>
+
+					<section>
+						&nbsp;<br />
+						<img src="esp8266.png" />
+					</section>
+
+					<section>
+						<pre style="font-size: 0.4em; max-height: none !important;"><code data-trim data-noescape style="max-height: none !important;">
+bool isPhoneStatusHeadset() {
+
+  char buffer[400];
+  if (!Client.connect(PHONE_HOST, 80)) {
+    return false;
+  }
+  Client.print("GET /admin/screendump.bmp HTTP/1.0\r\nConnection: close\r\n\r\n");
+
+  if ((!Client.connected()) || (Client.readBytes(buffer, 316) < 316)) {
+    Client.stop();
+    udpDebug("isPhoneStatusHeadset: request failure or unexpected response size");
+    return false;
+  }
+  Client.stop();
+  char* bmpPointer = strstr(buffer, "\r\n\r\n") + 4;
+
+  return (bmpPointer[0x5d] == 0xc7)   //   ***
+      && (bmpPointer[0x6d] == 0xbb)   //  *   *
+      && (bmpPointer[0x7d] == 0x7d)   // *     *      yes, this is the cropped
+      && (bmpPointer[0x8d] == 0x7c)   // *     **     portion of the headset icon
+      && (bmpPointer[0x9d] == 0x7c)   // *     **     that we are looking for in
+      && (bmpPointer[0xad] == 0x7c)   // *     **     the screendump
+      && (bmpPointer[0xbd] == 0xbf)   //  *
+      && (bmpPointer[0xcd] == 0xcf);  //   **
+
+}
+						</code></pre>
+					</section>
+
+					<section>
+						<pre style="font-size: 0.4em"><code data-trim data-noescape>
+void pressPhoneHeadsetKey() {
+
+  if (!Client.connect(PHONE_HOST, 80)) {
+    return;
+  }
+
+  Client.print("POST /CGI/Execute HTTP/1.0\r\n"
+               "Content-Length: 78\r\n"
+               "Content-Type: application/x-www-form-urlencoded\r\n"
+               "Connection: close\r\n\r\n"
+               "XML=&lt;CiscoIPPhoneExecute&gt;&lt;ExecuteItem URL=\"Key:Headset\"/&gt;"
+               "&lt;/CiscoIPPhoneExecute&gt;");
+
+  Client.stop();
+
+}
+						</code></pre>
+					</section>
+
+					<section>
+						<pre style="font-size: 0.4em"><code data-trim data-noescape>
+void setup() {
+  pinMode(AUX_SIGNAL, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(AUX_SIGNAL), auxSignalIsr, CHANGE);
+}
+
+ICACHE_RAM_ATTR void auxSignalIsr() {
+  // rudimentary debouncing, just in case we need it
+  if (millis() - lastInterruptTime < 100) {
+    return;
+  }
+  lastInterruptTime = millis();
+}
+
+void handleHeadsetStateChange() {
+  bool headsetOffHook = digitalRead(AUX_SIGNAL) == LOW;
+  bool phoneStatusHeadset = isPhoneStatusHeadset();
+  if (headsetOffHook != phoneStatusHeadset) {
+    pressPhoneHeadsetKey();
+  }
+}
+						</code></pre>
+					</section>
+
+					<section>
+						&nbsp;<br />
+						<img src="circuit-fritzing.png" />
+					</section>
+
+					<section>
+						&nbsp;<br />
+						<img src="circuit-real.jpg" />
+					</section>
+
+					<section>
+						&nbsp;<br />
+						<img src="finished-product.jpg" style="height: 600px;" />
+					</section>
+
+					<section>
+						<video src="it-works.mp4" data-autoplay loop></video>
+					</section>
+
+				</section>
+
+				<section>
+					<h3>Thanks!</h3>
+				</section>
+
+<!--
+				<section>
+					<div class="section-title">Background</div>
+					<div class="slide-title">Some caveats</div>
+
+					<section class="sub-slide-bulleted">
+
+					</section>
+				</section>
+					<section class="sub-slide-centered" data-transition="slide-in fade-out">
+						&quot;more than you ever wanted to know&quot;<br />
+						!=<br />
+						everything
+					</section>
+
+					<section class="sub-slide-centered" data-transition="slide-in fade-out">
+						many details omitted
+					</section>
+
+					<section class="sub-slide-centered" data-transition="slide-in fade-out">
+						this project is a series of nested rabbit holes
+					</section>
+
+					<section class="sub-slide-centered" data-transition="slide-in fade-out">
+						we'll talk motivation later
+					</section>
+				</section>
+-->
+<!--
+				<section>
+					<div class="section-title">Background</div>
+					<div class="slide-title">Headset Basics</div>
+
+					<section class="sub-slide-centered" style="vertical-align: bottom">
+
+					</section>
+
+					<section class="sub-slide-bulleted">
+						What actually changes for a wireless headset?
+						<ul>
+							<li class="fragment fade-in-then-semi-out">audio path to the phone is identical</li>
+							<li class="fragment fade-in-then-semi-out">but how do you know if the phone is ringing?</li>
+							<li class="fragment fade-in-then-semi-out">and how do you answer and end calls?</li>
+						</ul>
+					</section>
+
+					<section class="sub-slide-centered">
+						how do you answer or end a call if you're not at your desk?
+					</section>
+
+				</section>
+
+
+
+
+					<section class="sub-slide"><div class="slide-title">Caveats</div>
+						<ul>
+							<li>&quot;more than you ever wanted to know != everything&quot;</li>
+					</section>
+				</section>
+
+				<section>
+					<div style="text-align: left;">
+						<div class="section-title">Background</div>
+					</div>
+					<section class="sub-slide" style="vertical-align: top">
+						<div class="slide-title">Caveats</div>
+						Here is some general intro text for this sub-slide.
+						<ul>
+							<li>one</li>
+							<li>two</li>
+							<li>three</li>
+						</ul>
+					</section>
+					<section class="sub-slide">
+					</section>
+					<section>
+					<ul>
+						<li>one</li>
+						<li>two</li>
+						<li>three</li>
+					</ul>
+					</section>
+
+				</section>
+					Visual Asset Listing:
+					* photo of Jabra cordless headset
+					* photo of Cisco SPA504G
+					* mp4 or animated gif of the two working together
+
+
+
+
+
+				<section>
+					<h5>Background</h5>
+					<h3>Something something</h3>
+					blah
+					blah
+					blah
+					blah
+					blah
+					blah
+				</section>
+				<section>
+					How do headsets traditionally work?
+					* something about corded headsets and their usual RJ9/RJ10/RJ22/4P4C interface (and/or 2.5mm interface)
+					* something about cordless headsets maintaining the
+				</section>
+				<section>
+					Headset-Side Interface
+					(technically "headset base", but that gets annoying to say repeatedly, so I'm just gonna refer to this as
+					headset)
+					* jabra doesn't publish anything  but look at straight-through adapters
+					* protocol choice in jabra config
+					* dstg screen cap
+					* logic analyzer with nothing
+					* random online find
+					* final functional pinout
+				</section>
+				<section>
+					Phone-Side Interface
+					* can simulate key presses (include HTTP request) (even though Cisco docs claim this phone doesn't support
+					this particular API)
+					* how do we get state? well the plain HTTP interface gives us some clues as to whether any line has a call
+					connected, and we've got some XML endpoints we can hit for the current configuration, but none of these
+					actually tell us whether the speakerphone/handset/headset mode is in use
+					* ironically there are physical LEDs on the phone that light up per mode, but let's not go taking apart the
+					phone unless we need to...
+				</section>
+				<section>
+					Solution
+					* circuit diagram
+					* some snippets of code
+				</section>
+			</div>
+		</div>
+	-->
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+				controls: false,
+				controlsTutorial: false,
+				//transition: 'fade',
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [RevealHighlight]
+			});
+		</script>
+	</body>
+</html>
