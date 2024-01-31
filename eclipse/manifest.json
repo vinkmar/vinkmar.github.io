@@ -1,0 +1,14 @@
+{
+  "short_name": "Eclipse",
+  "name": "Eclipse",
+  "icons": [
+    {
+      "src": "eclipse.png",
+      "sizes": "252x253",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/eclipse/index.html",
+  "display": "standalone",
+  "orientation": "portrait"
+}
