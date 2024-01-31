@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Eclipse Tracker</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+body {
+    background-color: #000;
+    color: #fff; 
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    text-align: center;
+}
+div {
+    padding: 5px;
+}
+.title {
+    font-size: 20pt;
+    font-weight: bold;
+}
+.section {
+    background-color: #444;
+    border-radius: 10px;
+    margin: 10px;
+}
+.sectiontitle {
+    font-size: 8pt;
+    text-align: left;
+}
+.smallbody {
+    font-size: 12pt;
+}
+.smallbodyright {
+    font-size: 12pt;
+    text-align: right;
+}
+select {
+    font-size: 20pt;
+    background-color: #444;
+    color: #fff;
+    border: none;
+    text-align: center;
+    width: 100%;
+}
+.mediumbody {
+    font-size: 20pt;
+}
+.largebody {
+    font-size: 30pt;
+}
+.xlargebody {
+    font-size: 80pt;
+}
+</style>
+<script>
+
+// TODO: implement https://developer.mozilla.org/en-US/docs/Web/API/WakeLock/request
+
+// api documentation: https://aa.usno.navy.mil/data/api
+const dataCache = {
+
+    // from https://aa.usno.navy.mil/api/eclipses/solar/date?date=2024-04-08&coords=44.22568,-76.48151&height=74
+    "Kingston-BatteryPark": {"apiversion":"4.0.1","geometry":{"coordinates":[-76.48151,44.22568],"height":"74m","type":"Point"},"properties":{"day":8,"delta_t":"72.8s","description":"Sun in Total Eclipse at this Location","duration":"2h 24m 54.9s","duration_of_totality":"3m 05.8s","event":"Solar Eclipse of 2024 April 08","local_data":[{"altitude":"51.0","azimuth":"204.8","day":"8","phenomenon":"Eclipse Begins","position_angle":"231.9","time":"18:09:28.8","vertex_angle":"214.4"},{"altitude":"43.1","azimuth":"228.8","day":"8","phenomenon":"Totality Begins","position_angle":"21.3","time":"19:22:09.9","vertex_angle":"348.5"},{"altitude":"42.9","azimuth":"229.3","day":"8","phenomenon":"Maximum Eclipse","time":"19:23:42.0"},{"altitude":"42.7","azimuth":"229.7","day":"8","phenomenon":"Totality Ends","position_angle":"267.1","time":"19:25:15.7","vertex_angle":"233.8"},{"altitude":"32.2","azimuth":"246.8","day":"8","phenomenon":"Eclipse Ends","position_angle":"56.7","time":"20:34:23.7","vertex_angle":"15.1"}],"magnitude":"1.012","month":4,"obscuration":"100.0%","year":2024},"type":"Feature"},
+
+    // from https://aa.usno.navy.mil/api/eclipses/solar/date?date=2024-04-08&coords=44.59221,-75.69288&height=85
+    "Brockville-ViaRail": {"apiversion":"4.0.1","geometry":{"coordinates":[-75.69288,44.59221],"height":"85m","type":"Point"},"properties":{"day":8,"delta_t":"72.8s","description":"Sun in Total Eclipse at this Location","duration":"2h 24m 13.0s","duration_of_totality":"2m 46.3s","event":"Solar Eclipse of 2024 April 08","local_data":[{"altitude":"50.3","azimuth":"206.3","day":"8","phenomenon":"Eclipse Begins","position_angle":"232.0","time":"18:10:52.0","vertex_angle":"213.6"},{"altitude":"42.3","azimuth":"229.8","day":"8","phenomenon":"Totality Begins","position_angle":"13.9","time":"19:23:23.8","vertex_angle":"340.7"},{"altitude":"42.1","azimuth":"230.2","day":"8","phenomenon":"Maximum Eclipse","time":"19:24:46.2"},{"altitude":"41.9","azimuth":"230.6","day":"8","phenomenon":"Totality Ends","position_angle":"275.1","time":"19:26:10.2","vertex_angle":"241.5"},{"altitude":"31.4","azimuth":"247.4","day":"8","phenomenon":"Eclipse Ends","position_angle":"57.0","time":"20:35:05.0","vertex_angle":"15.5"}],"magnitude":"1.009","month":4,"obscuration":"100.0%","year":2024},"type":"Feature"},
+
+    // from https://aa.usno.navy.mil/api/eclipses/solar/date?date=2024-04-08&coords=44.58626,-75.68507&height=85
+    "Brockville-HardyPark": {"apiversion":"4.0.1","geometry":{"coordinates":[-75.68507,44.58626],"height":"85m","type":"Point"},"properties":{"day":8,"delta_t":"72.8s","description":"Sun in Total Eclipse at this Location","duration":"2h 24m 13.1s","duration_of_totality":"2m 48.2s","event":"Solar Eclipse of 2024 April 08","local_data":[{"altitude":"50.3","azimuth":"206.3","day":"8","phenomenon":"Eclipse Begins","position_angle":"232.0","time":"18:10:52.4","vertex_angle":"213.6"},{"altitude":"42.3","azimuth":"229.8","day":"8","phenomenon":"Totality Begins","position_angle":"14.6","time":"19:23:23.4","vertex_angle":"341.4"},{"altitude":"42.1","azimuth":"230.2","day":"8","phenomenon":"Maximum Eclipse","time":"19:24:46.7"},{"altitude":"41.9","azimuth":"230.6","day":"8","phenomenon":"Totality Ends","position_angle":"274.4","time":"19:26:11.5","vertex_angle":"240.8"},{"altitude":"31.4","azimuth":"247.5","day":"8","phenomenon":"Eclipse Ends","position_angle":"57.0","time":"20:35:05.5","vertex_angle":"15.5"}],"magnitude":"1.009","month":4,"obscuration":"100.0%","year":2024},"type":"Feature"},
+
+    // from https://aa.usno.navy.mil/api/eclipses/solar/date?date=2024-04-08&coords=44.17968,-77.37413&height=91
+    "Belleville-ViaRail": {"apiversion":"4.0.1","geometry":{"coordinates":[-77.37413,44.17968],"height":"91m","type":"Point"},"properties":{"day":8,"delta_t":"72.8s","description":"Sun in Total Eclipse at this Location","duration":"2h 25m 21.0s","duration_of_totality":"1m 58.6s","event":"Solar Eclipse of 2024 April 08","local_data":[{"altitude":"51.3","azimuth":"203.0","day":"8","phenomenon":"Eclipse Begins","position_angle":"231.2","time":"18:08:12.5","vertex_angle":"215.0"},{"altitude":"43.7","azimuth":"227.7","day":"8","phenomenon":"Totality Begins","position_angle":"356.2","time":"19:21:36.8","vertex_angle":"324.0"},{"altitude":"43.6","azimuth":"227.9","day":"8","phenomenon":"Maximum Eclipse","time":"19:22:35.4"},{"altitude":"43.4","azimuth":"228.2","day":"8","phenomenon":"Totality Ends","position_angle":"291.8","time":"19:23:35.5","vertex_angle":"259.3"},{"altitude":"32.9","azimuth":"245.9","day":"8","phenomenon":"Eclipse Ends","position_angle":"56.9","time":"20:33:33.4","vertex_angle":"15.6"}],"magnitude":"1.004","month":4,"obscuration":"100.0%","year":2024},"type":"Feature"},
+
+    // from https://aa.usno.navy.mil/api/eclipses/solar/date?date=2024-04-08&coords=44.15314,-77.38890&height=94
+    "Belleville-ZwicksPark": {"apiversion":"4.0.1","geometry":{"coordinates":[-77.3889,44.15314],"height":"94m","type":"Point"},"properties":{"day":8,"delta_t":"72.8s","description":"Sun in Total Eclipse at this Location","duration":"2h 25m 22.9s","duration_of_totality":"2m 06.3s","event":"Solar Eclipse of 2024 April 08","local_data":[{"altitude":"51.4","azimuth":"203.0","day":"8","phenomenon":"Eclipse Begins","position_angle":"231.3","time":"18:08:09.8","vertex_angle":"215.1"},{"altitude":"43.7","azimuth":"227.6","day":"8","phenomenon":"Totality Begins","position_angle":"358.6","time":"19:21:31.3","vertex_angle":"326.4"},{"altitude":"43.6","azimuth":"227.9","day":"8","phenomenon":"Maximum Eclipse","time":"19:22:33.7"},{"altitude":"43.5","azimuth":"228.2","day":"8","phenomenon":"Totality Ends","position_angle":"289.4","time":"19:23:37.6","vertex_angle":"256.9"},{"altitude":"32.9","azimuth":"245.9","day":"8","phenomenon":"Eclipse Ends","position_angle":"56.8","time":"20:33:32.7","vertex_angle":"15.5"}],"magnitude":"1.005","month":4,"obscuration":"100.0%","year":2024},"type":"Feature"},
+
+};
+
+let selected = Object.keys(dataCache)[0];
+
+function locationRefresh() {
+
+    selected = document.getElementById('location').value;
+
+    // update location details
+    document.getElementById('location-details').innerHTML = 
+        dataCache[selected].locationDetails;
+
+    // update timeline
+    document.getElementById('eclipse-start').innerHTML = 
+        new Date(dataCache[selected].eclipseStart).toLocaleTimeString('en-US', {hour12: false});
+    document.getElementById('totality-start').innerHTML = 
+        new Date(dataCache[selected].totalityStart).toLocaleTimeString('en-US', {hour12: false});
+    document.getElementById('peak').innerHTML = 
+        new Date(dataCache[selected].peak).toLocaleTimeString('en-US', {hour12: false});
+    document.getElementById('totality-end').innerHTML = 
+        new Date(dataCache[selected].totalityEnd).toLocaleTimeString('en-US', {hour12: false});
+    document.getElementById('eclipse-end').innerHTML = 
+        new Date(dataCache[selected].eclipseEnd).toLocaleTimeString('en-US', {hour12: false});
+
+    timeRefresh();
+
+}
+
+function timeRefresh() {
+
+    // update time display
+    const now = new Date(Date.now());
+    document.getElementById('time').innerHTML = now.toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit', fractionalSecondDigits: 1});
+
+    if (window.location.search === '?demo') {
+        // pretend it's eclipse day today
+        now.setFullYear(2024, 04, 08);
+    }
+
+    // update next event display
+    let interval = 0;
+    let nextEvent = '';
+    if (now.getTime() > dataCache[selected].eclipseEnd) {
+        interval = 'done';
+        nextEvent = 'until 2106';
+    } else if (now.getTime() > dataCache[selected].totalityEnd) {
+        interval = dataCache[selected].eclipseEnd - now.getTime();
+        nextEvent = 'until eclipse end';
+    } else if (now.getTime() > dataCache[selected].totalityStart) {
+        interval = dataCache[selected].totalityEnd - now.getTime();
+        nextEvent = 'until totality end';
+    } else if (now.getTime() > dataCache[selected].eclipseStart) {
+        interval = dataCache[selected].totalityStart - now.getTime();
+        nextEvent = 'until totality start';
+    } else {
+        interval = dataCache[selected].eclipseStart - now.getTime();
+        nextEvent = 'until eclipse start';
+    }
+
+    if (interval > 0) {
+        interval /= 1000;
+    }
+
+    if (interval > 86400) {
+        interval = Math.floor(interval / 86400) + 'd';
+    } else if (interval > 3600) {
+        interval = Math.floor(interval / 3600) + 'h';
+    } else if (interval > 60) {
+        interval = Math.floor(interval / 60) + 'm';
+    } else if (interval > 0) {
+        interval += "s";
+    }
+
+    document.getElementById('interval').innerHTML = interval;
+    document.getElementById('next-event').innerHTML = nextEvent;
+
+}
+
+window.onload = function() {
+
+    if (window.location.search === '?demo') {
+        document.getElementById('title').innerHTML = 'Demo Eclipse';
+    }
+
+    // add easier fields to work with to the dataCache
+    Object.keys(dataCache).forEach((key) => {
+        dataCache[key].locationDetails = 
+            dataCache[key].geometry.coordinates[0] + ', ' +
+            dataCache[key].geometry.coordinates[1] + ', ' +
+            dataCache[key].geometry.height;
+
+        dataCache[key].eclipseStart =
+            new Date('2024-04-08T' + dataCache[key].properties.local_data[0].time + 'Z').getTime();
+
+        dataCache[key].totalityStart =
+            new Date('2024-04-08T' + dataCache[key].properties.local_data[1].time + 'Z').getTime();
+
+        dataCache[key].peak =
+            new Date('2024-04-08T' + dataCache[key].properties.local_data[2].time + 'Z').getTime();
+
+        dataCache[key].totalityEnd =
+            new Date('2024-04-08T' + dataCache[key].properties.local_data[3].time + 'Z').getTime();
+
+        dataCache[key].eclipseEnd =
+            new Date('2024-04-08T' + dataCache[key].properties.local_data[4].time + 'Z').getTime();
+
+    });
+
+    // build out location dropdown based on what we have in dataCache
+    Object.keys(dataCache).forEach((key) => {
+        let o = document.createElement('option');
+        o.text = key;
+        document.getElementById('location').add(o);
+    });
+
+    locationRefresh();
+
+    document.getElementById('location').onchange = locationRefresh;
+
+    window.setInterval(timeRefresh, 100);
+
+}
+
+</script>
+</head>
+<body>
+<div id="title" class="title">Eclipse</div>
+<div class="section">
+    <div class="sectiontitle">Location</div>
+    <select id="location"></select>
+    <div id="location-details" class="smallbody">location-details</div>
+</div>
+<div class="section">
+    <div class="sectiontitle">Local Time</div>
+    <div id="time" class="largebody">time</div>
+</div>
+<div class="section">
+    <div class="sectiontitle">Next Event</div>
+    <div id="interval" class="xlargebody">interval</div>
+    <div id="next-event" class="mediumbody">next-event</div>
+</div>
+<div class="section">
+    <div class="sectiontitle">Timeline</div>
+    <div class="smallbodyright">Eclipse Start: <span id="eclipse-start">eclipse-start</span></div>
+    <div class="smallbodyright">Totality Start: <span id="totality-start">totality-start</span></div>
+    <div class="smallbodyright">Peak: <span id="peak">peak</span></div>
+    <div class="smallbodyright">Totality End: <span id="totality-end">totality-end</span></div>
+    <div class="smallbodyright">Eclipse End: <span id="eclipse-end">eclipse-end</span></div>
+</div>
+</body>
+</html>
