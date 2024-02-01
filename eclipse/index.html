@@ -155,6 +155,10 @@ function timeRefresh() {
 
 window.onload = function() {
 
+    if (navigator.serviceWorker) {
+        navigator.serviceWorker.register('sw.js');
+    }
+
     if (window.location.search === '?demo') {
         document.getElementById('title').innerHTML = 'Demo Eclipse';
     }

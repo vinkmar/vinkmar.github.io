@@ -4,7 +4,7 @@
   "icons": [
     {
       "src": "eclipse.png",
-      "sizes": "252x253",
+      "sizes": "any",
       "type": "image/png"
     }
   ],
