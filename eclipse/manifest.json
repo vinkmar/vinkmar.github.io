@@ -1,6 +1,6 @@
 {
-  "short_name": "Eclipse",
-  "name": "Eclipse",
+  "short_name": "Eclipse Tracker",
+  "name": "Eclipse Tracker",
   "icons": [
     {
       "src": "eclipse.png",
@@ -8,7 +8,7 @@
       "type": "image/png"
     }
   ],
-  "start_url": "/eclipse/index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "orientation": "portrait"
 }

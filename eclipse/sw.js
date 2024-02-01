@@ -1,6 +1,6 @@
-var cacheName = 'eclipse';
+var cacheName = 'eclipsetracker';
 var filesToCache = [
-  '/eclipse/index.html',
+  'index.html',
 ];
 
 self.addEventListener('install', function(e) {
