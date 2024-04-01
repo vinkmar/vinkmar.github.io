@@ -56,9 +56,7 @@ select {
 }
 </style>
 <script>
-const VERSION = '1.2';
-
-// TODO: implement https://developer.mozilla.org/en-US/docs/Web/API/WakeLock/request
+const VERSION = '1.3';
 
 // api documentation: https://aa.usno.navy.mil/data/api
 const dataCache = {
@@ -150,6 +148,16 @@ function timeRefresh() {
         interval = Math.floor(interval / 60) + 'm';
     } else if (interval > 0) {
         interval = Math.floor(interval) + "s";
+    }
+
+    if (interval == '5s' || interval == '4s' || interval == '3s' || interval == '2s') {
+        if (document.getElementById('interval').innerHTML != interval) {
+            navigator.vibrate(100);
+        }
+    } else if (interval == '1s') {
+        if (document.getElementById('interval').innerHTML != interval) {
+            navigator.vibrate(100, 900, 1000);
+        }
     }
 
     document.getElementById('interval').innerHTML = interval;
