@@ -56,7 +56,7 @@ select {
 }
 </style>
 <script>
-const VERSION = '1.5';
+const VERSION = '1.6';
 
 // api documentation: https://aa.usno.navy.mil/data/api
 const dataCache = {
@@ -156,7 +156,7 @@ function timeRefresh() {
         }
     } else if (interval == '1s') {
         if (document.getElementById('interval').innerHTML != interval) {
-            navigator.vibrate(100, 900, 1000);
+            navigator.vibrate([100, 900, 1000]);
         }
     }
 
@@ -170,14 +170,14 @@ let wakeLock = null;
 async function acquireWakeLock() {
     try {
         wakeLock = await navigator.wakeLock.request('screen');
-        document.getElementById('wakelock').innerHTML = '&#x1F441;';
+        document.getElementById('wakelock').innerHTML = '&#x2299;';
         wakeLock.addEventListener('release', () => {
-            document.getElementById('wakelock').innerHTML = '';
+            document.getElementById('wakelock').innerHTML = '&#x2298;';
             wakeLock = null;
             acquireWakeLock();
         });
     } catch (err) {
-        document.getElementById('wakelock').innerHTML = '';
+        document.getElementById('wakelock').innerHTML = '&#x2298;';
     }
 }
 
