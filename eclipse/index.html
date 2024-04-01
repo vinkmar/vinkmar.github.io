@@ -18,6 +18,8 @@ div {
 .title {
     font-size: 20pt;
     font-weight: bold;
+    display: flex;
+    justify-content: space-between;
 }
 .section {
     background-color: #444;
@@ -54,6 +56,7 @@ select {
 }
 </style>
 <script>
+const VERSION = '1.2';
 
 // TODO: implement https://developer.mozilla.org/en-US/docs/Web/API/WakeLock/request
 
@@ -107,12 +110,13 @@ function timeRefresh() {
 
     // update time display
     const now = new Date(Date.now());
-    document.getElementById('time').innerHTML = now.toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit', fractionalSecondDigits: 1});
 
     if (window.location.search === '?demo') {
         // pretend it's eclipse day today
-        now.setFullYear(2024, 04, 08);
+        now.setFullYear(2024, 3, 8);
     }
+
+    document.getElementById('time').innerHTML = now.toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit', fractionalSecondDigits: 1});
 
     // update next event display
     let interval = 0;
@@ -140,12 +144,12 @@ function timeRefresh() {
 
     if (interval > 86400) {
         interval = Math.floor(interval / 86400) + 'd';
-    } else if (interval > 3600) {
-        interval = Math.floor(interval / 3600) + 'h';
-    } else if (interval > 60) {
+    } else if (interval > (3600 * 2)) { // two hours or more
+        interval = Math.floor(interval / 360) / 10 + 'h'; // include one decimal
+    } else if (interval > (60 * 5)) { // five minutes or more
         interval = Math.floor(interval / 60) + 'm';
     } else if (interval > 0) {
-        interval += "s";
+        interval = Math.floor(interval) + "s";
     }
 
     document.getElementById('interval').innerHTML = interval;
@@ -153,15 +157,42 @@ function timeRefresh() {
 
 }
 
-window.onload = function() {
+let wakeLock = null;
 
+async function acquireWakeLock() {
+    try {
+        wakeLock = await navigator.wakeLock.request('screen');
+        document.getElementById('wakelock').innerHTML = '&#x1F441;';
+        wakeLock.addEventListener('release', () => {
+            document.getElementById('wakelock').innerHTML = '';
+            wakeLock = null;
+            acquireWakeLock();
+        });
+    } catch (err) {
+        document.getElementById('wakelock').innerHTML = '';
+    }
+}
+
+document.addEventListener('visibilitychange', () => {
+    if (wakeLock == null) {
+        acquireWakeLock();
+    }
+});
+
+window.onload = async function() {
+
+    // register a pointless service worker so that we can be installed as a PWA
     if (navigator.serviceWorker) {
         navigator.serviceWorker.register('sw.js');
     }
 
+    // check & indicate if we're in demo mode
     if (window.location.search === '?demo') {
-        document.getElementById('title').innerHTML = 'Demo Eclipse';
+        document.getElementById('demo').innerHTML = 'DEMO';
     }
+
+    // display correct version
+    document.getElementById('version').innerHTML = `v${VERSION}`;
 
     // add easier fields to work with to the dataCache
     Object.keys(dataCache).forEach((key) => {
@@ -187,6 +218,8 @@ window.onload = function() {
 
     });
 
+    acquireWakeLock();
+
     // build out location dropdown based on what we have in dataCache
     Object.keys(dataCache).forEach((key) => {
         let o = document.createElement('option');
@@ -205,7 +238,10 @@ window.onload = function() {
 </script>
 </head>
 <body>
-<div id="title" class="title">Eclipse Tracker</div>
+<div id="title" class="title">
+    <span>Eclipse Tracker <span id="version"></span></span>
+    <span><span id="demo"></span> <span id="wakelock"></span></span>
+</div>
 <div class="section">
     <div class="sectiontitle">Location</div>
     <select id="location"></select>
