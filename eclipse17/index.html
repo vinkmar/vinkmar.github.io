@@ -56,7 +56,7 @@ select {
 }
 </style>
 <script>
-const VERSION = '1.6';
+const VERSION = '1.7';
 
 // api documentation: https://aa.usno.navy.mil/data/api
 const dataCache = {
@@ -162,6 +162,9 @@ function timeRefresh() {
 
     document.getElementById('interval').innerHTML = interval;
     document.getElementById('next-event').innerHTML = nextEvent;
+    if (navigator.userActivation) {
+        document.getElementById('stickyactivation').innerHTML = navigator.userActivation.hasBeenActive ? '&#x2248;' : '&#x2249;';
+    }
 
 }
 
@@ -248,7 +251,7 @@ window.onload = async function() {
 <body>
 <div id="title" class="title">
     <span>Eclipse Tracker <span id="version"></span></span>
-    <span><span id="demo"></span> <span id="wakelock"></span></span>
+    <span><span id="demo"></span> <span id="stickyactivation"></span> <span id="wakelock"></span></span>
 </div>
 <div class="section">
     <div class="sectiontitle">Location</div>
