@@ -1,4 +1,4 @@
-var cacheName = 'eclipsetracker17';
+var cacheName = 'eclipsetracker18';
 var filesToCache = [
   'index.html',
 ];
