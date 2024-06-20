@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>CVSS Notepad</title>
+        <style>
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+            }
+            div {
+                padding: 2px;
+                margin: 2px;
+                border-radius: 10px;
+            }
+            .Critical {
+                background-color: #ffa6a6;
+            }
+            .High {
+                background-color: #ffb66c;
+            }
+            .Medium {
+                background-color: #ffffa6;
+            }
+            .Low {
+                background-color: #afd095;
+            }
+            .None {
+                background-color: silver;
+            }
+            .vector {
+                display: flex;
+                align-items: center;
+                border: 4px solid white;
+                margin-bottom: 10px;
+            }
+            .metric {
+                display: inline-block;
+                background-color: white;
+                text-align: center;
+                border: 2px solid white;
+                width: 120px;
+                margin: 4px;
+            }
+            .cvss {
+                display: inline-block;
+                margin: 4px;
+                text-align: left;
+            }
+            .metric-title {
+                font-size: 8pt;
+                font-weight: bold;
+            }
+            .metric-value {
+                font-size: 14pt;
+                font-weight: bold;
+            }
+            .cvss-value {
+                font-size: 20pt;
+                font-weight: bold;
+            }
+            .cvss-severity {
+                font-size: 8pt;
+                font-weight: bold;
+            }
+            .selected {
+                border-color: black;
+            }
+        </style>
+        <script src="https://www.first.org/cvss/calculator/cvsscalc31.js"></script>
+        <script>
+            let vectors = [newVector()];
+            const metricNames = ['av', 'ac', 'pr', 'ui', 's', 'c', 'i', 'a'];
+            let vectorCursor = 0;
+            let metricCursor = 0;
+
+            function newVector() {
+                return {av:'',ac:'',pr:'',ui:'',s:'',c:'',i:'',a:''};
+            }
+
+            function vectorNode(index, vector) {
+                let n = document.createElement('div');
+                n.classList.add('vector');
+                n.id = `vector${index}`;
+
+                n.appendChild(metricNode(index, 0, 'Access Vector', 
+                    {'n':'Network','a':'Adjacent','l':'Local','p':'Physical','':'-'}[vector.av]));
+                n.appendChild(metricNode(index, 1, 'Attack Complexity', 
+                    {'l':'Low','h':'High','':'-'}[vector.ac]));
+                n.appendChild(metricNode(index, 2, 'Privileges Required', 
+                    {'n':'None','l':'Low','h':'High','':'-'}[vector.pr]));
+                n.appendChild(metricNode(index, 3, 'User Interaction', 
+                    {'n':'None','r':'Required','':'-'}[vector.ui]));
+                n.appendChild(metricNode(index, 4, 'Scope', 
+                    {'u':'Unchanged','c':'Changed','':'-'}[vector.s]));
+                n.appendChild(metricNode(index, 5, 'Confidentiality', 
+                    {'n':'None','l':'Low','h':'High','':'-'}[vector.c]));
+                n.appendChild(metricNode(index, 6, 'Integrity', 
+                    {'n':'None','l':'Low','h':'High','':'-'}[vector.i]));
+                n.appendChild(metricNode(index, 7, 'Availability', 
+                    {'n':'None','l':'Low','h':'High','':'-'}[vector.a]));
+
+                let cvss = CVSS31.calculateCVSSFromMetrics(vector.av.toUpperCase(), 
+                                                           vector.ac.toUpperCase(), 
+                                                           vector.pr.toUpperCase(), 
+                                                           vector.ui.toUpperCase(), 
+                                                           vector.s.toUpperCase(), 
+                                                           vector.c.toUpperCase(), 
+                                                           vector.i.toUpperCase(), 
+                                                           vector.a.toUpperCase());
+                n.appendChild(cvssNode(cvss));
+                if (cvss.success === true) {
+                    n.classList.add(cvss.baseSeverity);
+                } else {
+                    n.classList.add('None');
+                }
+
+                return n;
+            }
+
+            function metricNode(vectorIndex, index, title, value) {
+
+                let n = document.createElement('div');
+                n.classList.add('metric');
+                n.id = `vector${vectorIndex}metric${index}`;
+
+                let t = document.createElement('div');
+                t.classList.add('metric-title');
+                t.appendChild(document.createTextNode(title));
+
+                let v = document.createElement('div');
+                v.classList.add('metric-value');
+                v.appendChild(document.createTextNode(value));
+
+                n.appendChild(t);
+                n.appendChild(v);
+
+                return n;
+
+            }
+
+            function cvssNode(cvss) {
+                let n = document.createElement('div');
+                n.classList.add('cvss');
+                let v = document.createElement('div');
+                v.classList.add('cvss-value');
+                let t = document.createElement('div');
+                t.classList.add('cvss-severity');
+                if (cvss.success === true) {
+                    v.appendChild(document.createTextNode(cvss.baseMetricScore));
+                    t.appendChild(document.createTextNode(cvss.baseSeverity));
+                } else {
+                    v.innerHTML = '&nbsp;';
+                    t.innerHTML = '&nbsp;';
+                }
+                n.appendChild(v);
+                n.appendChild(t);
+                return n;
+            }
+
+            function redraw() {
+
+                let r = document.getElementById('root');
+                r.innerHTML = '';
+                let vectorCount = 0;
+                vectors.forEach(vector => {
+                    r.appendChild(vectorNode(vectorCount++, vector));
+                });
+
+                // draw cursor
+                if (vectorCursor >= 0) {
+                    if (metricCursor >= 0) {
+                        document.getElementById(`vector${vectorCursor}metric${metricCursor}`).classList.add('selected');
+                    } else {
+                        document.getElementById(`vector${vectorCursor}`).classList.add('selected');
+                    }
+                }
+
+            }
+
+            addEventListener('keydown', (event) => {
+                if (['Backspace','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Delete','Escape','Insert','Enter'].includes(event.key)) {
+                    event.preventDefault();
+                }
+
+                if (event.key === 'ArrowRight') {
+                    metricCursor = (metricCursor == 7) ? (0) : (metricCursor + 1);
+                
+                } else if (event.key === 'ArrowLeft') {
+                    metricCursor = (metricCursor == 0) ? (7) : (metricCursor - 1);
+                
+                } else if (event.key === 'Escape') {
+                    metricCursor = -1;
+                
+                } else if (event.key === 'ArrowUp') {
+                    vectorCursor = (vectorCursor == 0) ? (vectors.length - 1) : (vectorCursor - 1);
+
+                } else if (event.key === 'ArrowDown') {
+                    vectorCursor = (vectorCursor == vectors.length - 1) ? (0) : (vectorCursor + 1);
+
+                } else if (metricCursor == -1 && event.key === 'Backspace') {
+                    // clear this vector
+                    vectors[vectorCursor] = newVector();
+
+                } else if (metricCursor == -1 && vectors.length > 1 && event.key === 'Delete') {
+                    // delete this vector
+                    vectors.splice(vectorCursor,1);
+                    if (vectorCursor == vectors.length) {
+                        vectorCursor--;
+                    }
+
+                } else if (event.key === 'Backspace' || event.key === 'Delete') {
+                    // clear this metric
+                    vectors[vectorCursor][metricNames[metricCursor]] = '';
+
+                } else if (metricCursor == -1 && event.key === 'Enter') {
+                    metricCursor = 0;
+
+                } else if (metricCursor == -1 && event.key === 'd') {
+                    // duplicate this vector
+                    let d = newVector();
+                    let v = vectors[vectorCursor];
+                    d.av = v.av;
+                    d.ac = v.ac; 
+                    d.pr = v.pr;
+                    d.ui = v.ui;
+                    d.s = v.s;
+                    d.c = v.c;
+                    d.i = v.i;
+                    d.a = v.a;
+                    vectors.splice(vectorCursor + 1, 0, d);
+
+                } else if (metricCursor == -1 && ['n','i','Insert'].includes(event.key)) {
+                    // add a new vector
+                    vectors.splice(vectorCursor + 1, 0, newVector());
+
+                } else if (metricCursor == 0 && ['n','a','l','p'].includes(event.key)) {
+                    // set attack vector
+                    vectors[vectorCursor].av = event.key;
+                    if (vectors[vectorCursor][metricNames[metricCursor + 1]] == '') {
+                        metricCursor++;
+                    }
+
+                } else if (metricCursor == 1 && ['l','h'].includes(event.key)) {
+                    // set attack complexity
+                    vectors[vectorCursor].ac = event.key;
+                    if (vectors[vectorCursor][metricNames[metricCursor + 1]] == '') {
+                        metricCursor++;
+                    }
+
+                } else if (metricCursor == 2 && ['n','l','h'].includes(event.key)) {
+                    // set privileges required
+                    vectors[vectorCursor].pr = event.key;
+                    if (vectors[vectorCursor][metricNames[metricCursor + 1]] == '') {
+                        metricCursor++;
+                    }
+
+                } else if (metricCursor == 3 && ['n','r'].includes(event.key)) {
+                    // set user interaction
+                    vectors[vectorCursor].ui = event.key;
+                    if (vectors[vectorCursor][metricNames[metricCursor + 1]] == '') {
+                        metricCursor++;
+                    }
+
+                } else if (metricCursor == 4 && ['u','c'].includes(event.key)) {
+                    // set scope
+                    vectors[vectorCursor].s = event.key;
+                    if (vectors[vectorCursor][metricNames[metricCursor + 1]] == '') {
+                        metricCursor++;
+                    }
+
+                } else if (metricCursor == 5 && ['n','l','h'].includes(event.key)) {
+                    // set confidentiality 
+                    vectors[vectorCursor].c = event.key;
+                    if (vectors[vectorCursor][metricNames[metricCursor + 1]] == '') {
+                        metricCursor++;
+                    }
+
+                } else if (metricCursor == 6 && ['n','l','h'].includes(event.key)) {
+                    // set integrity 
+                    vectors[vectorCursor].i = event.key;
+                    if (vectors[vectorCursor][metricNames[metricCursor + 1]] == '') {
+                        metricCursor++;
+                    }
+
+                } else if (metricCursor == 7 && ['n','l','h'].includes(event.key)) {
+                    // set availability  
+                    vectors[vectorCursor].a = event.key;
+
+                }
+                
+                redraw();
+
+            });
+
+        </script>
+    </head>
+    <body onload="redraw();">
+        <div id="root">&nbsp;</div>
+    </body>
+</html>
