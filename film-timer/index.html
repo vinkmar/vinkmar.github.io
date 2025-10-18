@@ -24,23 +24,25 @@ input[type=button] {
 
 #timer {
     text-align: center;
-    font-size: 230pt;
+    font-size: 210pt;
     font-weight: bold;
-    margin: 5px;
+    
 }
 
 #status {
     position: absolute;
-    top: 140pt;
-    left: 27%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     background-color: red;
     color: white;
     text-align: center;
     font-size: 80pt;
     font-weight: bold;
-    margin: 5px;
     padding-left: 20px;
     padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     visibility: hidden;
 }
 
@@ -161,7 +163,7 @@ function tick() {
 <div>Agit. Dur.<br /><input type="text" id="agitationLength" inputmode="numeric" /></div>
 <div><input type="button" value="Toggle" onclick="startStop();"/>&nbsp;<span id="wakelock">&nbsp;</span></div>
 </div>
-<div>
+<div style="position: relative;">
     <div id="timer">00:00</div>
     <div id="status">agitate</div>
 </div>
