@@ -6,6 +6,7 @@
 body {
     font-family: 'Arial', 'Helvetica', sans-serif;
     font-size: 14pt;
+    overflow: hidden;
 }
 input[type=text] {
     width: 50;
@@ -21,11 +22,26 @@ input[type=button] {
     color: grey;
 }
 
-h1 {
+#timer {
     text-align: center;
-    font-size: 130pt;
+    font-size: 230pt;
     font-weight: bold;
     margin: 5px;
+}
+
+#status {
+    position: absolute;
+    top: 140pt;
+    left: 27%;
+    background-color: red;
+    color: white;
+    text-align: center;
+    font-size: 80pt;
+    font-weight: bold;
+    margin: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+    visibility: hidden;
 }
 
 #settings {
@@ -116,14 +132,18 @@ function tick() {
   
   let status = document.getElementById('status');
   if (time >= totalTime) {
-    status.innerHTML = 'done';
+    status.innerHTML = '&nbsp;';
+    status.style.visibility = 'hidden';
     intervalId = clearInterval(intervalId);
   } else if (time < initialAgitation) {
     status.innerHTML = 'agitate';
+    status.style.visibility = 'visible';
   } else if (((time - initialAgitation) % agitationInterval) < agitationLength) {
     status.innerHTML = 'agitate';
+    status.style.visibility = 'visible';
   } else {
     status.innerHTML = '&nbsp;';
+    status.style.visibility = 'hidden';
   }
   
   console.log(`t=${time} ${status}`);
@@ -141,7 +161,9 @@ function tick() {
 <div>Agit. Dur.<br /><input type="text" id="agitationLength" inputmode="numeric" /></div>
 <div><input type="button" value="Toggle" onclick="startStop();"/>&nbsp;<span id="wakelock">&nbsp;</span></div>
 </div>
-<h1 id="timer">00:00</h1>
-<h1 id="status">hello</h1>
+<div>
+    <div id="timer">00:00</div>
+    <div id="status">agitate</div>
+</div>
 </body>
 </html>
