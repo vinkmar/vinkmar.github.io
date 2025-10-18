@@ -1,0 +1,147 @@
+<html>
+<head>
+<title>Film Agitation Timer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style type="text/css">
+body {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 14pt;
+}
+input[type=text] {
+    width: 50;
+    font-size: 16pt;
+    color: grey;
+    border: 1px solid grey;
+    border-radius: 5px;
+}
+
+input[type=button] {
+    font-size: 16pt;
+    height: 2em;
+    color: grey;
+}
+
+h1 {
+    text-align: center;
+    font-size: 130pt;
+    font-weight: bold;
+    margin: 5px;
+}
+
+#settings {
+    color: grey;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#settings > * {
+    flex-grow: 1;
+    flex-basis: 0;
+    text-align: center;
+    padding: 5px;
+}
+</style>
+<script type="text/javascript">
+
+async function acquireWakeLock() {
+    try {
+        wakeLock = await navigator.wakeLock.request('screen');
+        document.getElementById('wakelock').innerHTML = '&#x2299;';
+        wakeLock.addEventListener('release', () => {
+            document.getElementById('wakelock').innerHTML = '&#x2298;';
+            wakeLock = null;
+            acquireWakeLock();
+        });
+    } catch (err) {
+        document.getElementById('wakelock').innerHTML = '&#x2298;';
+    }
+}
+
+document.addEventListener('visibilitychange', () => {
+    if (wakeLock == null) {
+        acquireWakeLock();
+    }
+});
+
+window.onload = async function() {
+
+    acquireWakeLock();
+
+};
+
+// Fixed parameters
+let totalTime = 120;
+let initialAgitation = 30;
+let agitationInterval = 30;
+let agitationLength = 10;
+
+// State parameters
+let time = 0;
+
+let intervalId = undefined;
+
+function startStop() {
+
+    if (intervalId) {
+        if (window.confirm('Cancel timer?')) {
+            intervalId = clearInterval(intervalId);
+            document.getElementById('status').innerHTML = 'cancelled';
+            return;
+        } else {
+            return;
+        }
+    }
+
+    totalTime = document.getElementById('totalTime').value;
+    initialAgitation = document.getElementById('initialAgitation').value;
+    agitationInterval = document.getElementById('agitationInterval').value;
+    agitationLength = document.getElementById('agitationLength').value;
+    time = 0;
+    document.getElementById('timer').innerHTML = formatTime(totalTime);
+    document.getElementById('status').innerHTML = '&nbsp;'
+    intervalId = setInterval(tick, 1000);
+
+}
+
+function formatTime(t) {
+
+    return `${String('00' + (Math.floor(t/60))).substr(-2)}:${String('00' + (t%60)).substr(-2)}`;
+
+}
+
+function tick() {
+
+  document.getElementById('timer').innerHTML = formatTime(totalTime - time);
+  
+  let status = document.getElementById('status');
+  if (time >= totalTime) {
+    status.innerHTML = 'done';
+    intervalId = clearInterval(intervalId);
+  } else if (time < initialAgitation) {
+    status.innerHTML = 'agitate';
+  } else if (((time - initialAgitation) % agitationInterval) < agitationLength) {
+    status.innerHTML = 'agitate';
+  } else {
+    status.innerHTML = '&nbsp;';
+  }
+  
+  console.log(`t=${time} ${status}`);
+  time++;
+
+}
+
+</script>
+</head>
+<body>
+<div id="settings">
+<div>Time<br /><input type="text" id="totalTime" inputmode="numeric" /></div>
+<div>Init. Agit.<br /><input type="text" id="initialAgitation" inputmode="numeric" /></div>
+<div>Agit. Int.<br /><input type="text" id="agitationInterval" inputmode="numeric" /></div>
+<div>Agit. Dur.<br /><input type="text" id="agitationLength" inputmode="numeric" /></div>
+<div><input type="button" value="Toggle" onclick="startStop();"/>&nbsp;<span id="wakelock">&nbsp;</span></div>
+</div>
+<h1 id="timer">00:00</h1>
+<h1 id="status">hello</h1>
+</body>
+</html>
