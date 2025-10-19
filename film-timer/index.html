@@ -104,7 +104,8 @@ function startStop() {
     if (intervalId) {
         if (window.confirm('Cancel timer?')) {
             intervalId = clearInterval(intervalId);
-            document.getElementById('status').innerHTML = 'cancelled';
+            document.getElementById('status').style.visibility = 'hidden';
+            document.getElementById('timer').innerHTML = '00:00';
             return;
         } else {
             return;
@@ -119,7 +120,6 @@ function startStop() {
     document.getElementById('timer').innerHTML = formatTime(totalTime);
     document.getElementById('status').innerHTML = '&nbsp;'
     intervalId = setInterval(tick, 1000);
-    document.documentElement.requestFullscreen();
 
 }
 
@@ -154,17 +154,16 @@ function tick() {
 
 }
 
-document.documentElement.requestFullscreen();
-
 </script>
 </head>
 <body>
 <div id="settings">
+<div><input type="button" value="&nbsp;FS&nbsp;" onclick="document.documentElement.requestFullscreen();" />&nbsp;<span id="wakelock">&nbsp;</span></div>
 <div>Time<br /><input type="text" id="totalTime" inputmode="numeric" /></div>
 <div>Init. Agit.<br /><input type="text" id="initialAgitation" inputmode="numeric" /></div>
 <div>Agit. Int.<br /><input type="text" id="agitationInterval" inputmode="numeric" /></div>
 <div>Agit. Dur.<br /><input type="text" id="agitationLength" inputmode="numeric" /></div>
-<div><input type="button" value="Toggle" onclick="startStop();"/>&nbsp;<span id="wakelock">&nbsp;</span></div>
+<div><input type="button" value="&nbsp;Go&nbsp;" onclick="startStop();"/></div>
 </div>
 <div style="position: relative;">
     <div id="timer">00:00</div>
