@@ -105,6 +105,7 @@ function startStop() {
         if (window.confirm('Cancel timer?')) {
             intervalId = clearInterval(intervalId);
             document.getElementById('status').innerHTML = 'cancelled';
+            document.exitFullscreen();
             return;
         } else {
             return;
@@ -119,6 +120,7 @@ function startStop() {
     document.getElementById('timer').innerHTML = formatTime(totalTime);
     document.getElementById('status').innerHTML = '&nbsp;'
     intervalId = setInterval(tick, 1000);
+    document.documentElement.requestFullscreen();
 
 }
 
